@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Header Component 應該符合快照 (snapshot) 1`] = `
+<DocumentFragment>
+  <header
+    class="bg-white shadow-sm"
+  >
+    <div
+      class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8"
+    >
+      <h1
+        class="text-2xl font-bold text-gray-900"
+      >
+        專科教室借用系統
+      </h1>
+    </div>
+  </header>
+</DocumentFragment>
+`;

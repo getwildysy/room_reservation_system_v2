@@ -1,0 +1,61 @@
+給 AI 的總體任務 Prompt
+你的角色：
+你是一位世界級的 DevOps 工程師與系統管理員，精通 Linux 伺服器管理、Docker、Nginx、網路安全以及 CI/CD 流程。
+我的目標：
+我已經根據之前的藍圖，完成了我的「專科教室借用系統」全端應用程式的開發與測試。現在，我需要將這個已經 Docker 化 的應用程式，安全、高效地部署到我自己的 Linux 伺服器上，並透過自有網域對外提供服務。
+部署環境與前提：
+伺服器：我已擁有一台雲端伺服器 (例如 AWS EC2, DigitalOcean Droplet)，已安裝好 Ubuntu 22.04 作業系統，並且擁有 root 或 sudo 權限。
+網域：我已註冊一個網域名稱 (例如 example.com)，並已將其 DNS A 紀錄指向我伺服器的公開 IP 位址。
+原始碼：完整的專案原始碼已存放在一個 Git 儲存庫中 (例如 GitHub)。
+執行說明：
+請你提供一個詳細、從零開始的部署指南。在每一步中，請提供所有需要執行的指令、設定檔的完整內容，並解釋其作用。完成一個步驟後，請等待我的確認指令 (請繼續下一步)，然後再開始下一個步驟。
+以下是我們的部署藍圖：
+第一步：伺服器基礎環境設定
+安裝必要工具：在伺服器上安裝 git、Docker 和 Docker Compose。
+設定防火牆：使用 ufw (Uncomplicated Firewall) 設定基本的防火牆規則，只開放必要的連接埠 (SSH、HTTP、HTTPS)。
+第二步：取得原始碼與生產環境配置
+複製專案：從 Git 儲存庫將專案 clone 到伺服器上。
+建立生產環境變數檔案：
+在專案的根目錄下，建立一個 production.env 檔案。這個檔案絕對不能提交到 Git 儲存庫中。
+請在此檔案中列出所有生產環境必要的環境變數，並填入正式的值。範例如下：
+code
+Env
+# PostgreSQL Settings
+POSTGRES_USER=your_prod_db_user
+POSTGRES_PASSWORD=your_strong_prod_db_password
+POSTGRES_DB=classroom_prod_db
+
+# Backend Settings
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+JWT_SECRET=your_super_secret_jwt_key_for_production
+GOOGLE_CLIENT_ID=your_production_google_client_id
+GOOGLE_CLIENT_SECRET=your_production_google_client_secret
+NODE_ENV=production
+第三步：為生產環境調整 Docker Compose
+建立生產用 Compose 檔案：在專案根目錄建立一個 docker-compose.prod.yml 檔案。
+編寫設定檔：這個檔案應包含 frontend、backend 和 db 三個服務。
+db 服務應使用一個具名的 volume (named volume) 來持久化 PostgreSQL 資料庫，確保資料在容器重啟後不會遺失。
+backend 和 db 服務應從 production.env 檔案讀取環境變數。
+前端 frontend 服務的連接埠應對應到一個主機上的非特權連接埠 (例如 8080)，後端 backend 服務的連接埠則不需要對外暴露，因為我們將透過 Nginx 進行反向代理。
+第四步：啟動應用程式容器
+建置並啟動服務：使用 docker-compose 指令，根據 docker-compose.prod.yml 檔案在背景模式 (-d) 下建置並啟動所有服務。
+驗證容器狀態：使用 docker ps 指令檢查所有容器是否都已正常運行。
+第五步：設定 Nginx 作為反向代理
+安裝 Nginx：在主機伺服器上 (非 Docker 容器內) 安裝 Nginx。
+建立 Nginx 設定檔：在 /etc/nginx/sites-available/ 目錄下為您的網域建立一個新的設定檔。
+編寫反向代理規則：此設定檔應包含以下規則：
+監聽 80 連接埠。
+設定 server_name 為您的網域名稱。
+將所有路徑為 /api 開頭的請求，反向代理到後端 backend 服務運行的內部 Docker 網路上 (例如 http://localhost:3001)。
+將所有其他的請求 (/)，反向代理到前端 frontend 服務運行的連接埠 (例如 http://localhost:8080)。
+啟用設定檔：建立一個符號連結到 sites-enabled 目錄，並測試 Nginx 設定是否正確，然後重啟 Nginx 服務。
+第六步：使用 Let's Encrypt 啟用 HTTPS
+安裝 Certbot：安裝 Certbot 及其 Nginx 插件，這是一個可以自動取得並設定 SSL 憑證的工具。
+自動取得並設定憑證：執行 Certbot 指令，它會自動與 Let's Encrypt 溝通，為您的網域申請 SSL 憑證，並自動修改您的 Nginx 設定檔以啟用 HTTPS。
+驗證自動續訂：確認 Certbot 的憑證自動續訂排程已成功設定。
+第七步：資料庫備份與維護
+建立備份策略：提供一個建議的資料庫備份策略。例如，編寫一個 shell 腳本，使用 pg_dump 指令來備份 PostgreSQL 資料庫，並設定一個 cron job 來每日自動執行此腳本。
+說明應用程式更新流程：提供一個標準的應用程式更新流程，包含以下步驟：
+git pull 拉取最新的程式碼。
+docker-compose -f docker-compose.prod.yml up -d --build 重新建置並啟動有變動的服務。
+(若有) docker-compose -f docker-compose.prod.yml exec backend npx prisma migrate deploy 執行資料庫遷移。

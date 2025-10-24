@@ -1,0 +1,73 @@
+給 AI 的總體任務 Prompt
+你的角色：
+你是一位世界級的資深全端開發者，精通 React、Node.js、TypeScript、PostgreSQL、Docker、JWT 驗證、OAuth 2.0 流程，並對**完整的軟體測試策略（單元測試、整合測試、E2E 測試）**有著豐富的實戰經驗。
+我的目標：
+我希望將我目前這個純前端的 React「專科教室借用系統」，逐步重構成一個可供正式上線、具備高品質測試覆蓋的生產環境全端應用程式。
+最終架構要求：
+前後端分離：前端使用 React SPA，後端使用 Node.js 搭配 Express 框架提供 API。
+資料庫：使用 PostgreSQL 作為持久化資料庫。
+使用者驗證與授權：支援 Email/密碼及 Google OAuth 2.0 登入，並使用 JWT 進行 API 驗證與角色權限控制。
+容器化：整個應用程式使用 Docker 與 Docker Compose 進行容器化管理與部署。
+管理員功能：管理員擁有專屬後台，可對教室進行 CRUD 操作。
+完整的測試覆蓋：應用程式應包含單元測試、整合測試與端對端 (E2E) 測試。
+執行說明：
+請你一步一步地引導我完成這個過程。在每一步中，請提供所有需要新增或修改的程式碼，並詳細解釋你做了哪些改動。完成一個步驟後，請等待我的確認指令 (請繼續下一步)，然後再開始下一個步驟。
+以下是我們的開發藍圖：
+第一步：建立後端服務與重構專案結構
+重構專案結構：建立 frontend 和 backend 子目錄，並將現有前端檔案遷移至 frontend。
+初始化後端專案：在 backend 目錄初始化 Node.js 專案，安裝 TypeScript、Express、ts-node-dev。
+建立基本伺服器：建立一個最小化的 Express 伺服器。
+【測試】設定後端測試環境：安裝 jest、ts-jest 和 supertest。建立 jest.config.js 檔案，並編寫一個簡單的測試案例，確保 GET /api 測試路由能回傳正確的歡迎訊息。
+第二步：開發核心功能的 API
+資料移至後端：在後端暫時用陣列存放教室和預約資料。
+建立核心 API 路由：GET /api/classrooms、GET /api/reservations、POST /api/reservations。
+設定 CORS。
+【測試】編寫 API 整合測試：使用 supertest 為剛剛建立的三個 API 端點編寫整合測試。測試應驗證：
+GET 請求是否能回傳正確的狀態碼和資料結構。
+POST 請求是否能成功建立新資料，並回傳成功的狀態碼。
+POST 請求在缺少必要欄位時，是否能回傳錯誤的狀態碼。
+第三步：整合前後端
+重構前端資料獲取：修改 App.tsx，移除靜態資料，改為從後端 API 非同步載入。
+更新預約功能：修改預約函式，使其發送 POST 請求到後端。
+【測試】設定前端測試環境：在 frontend 目錄中，安裝 jest、@testing-library/react 和 @testing-library/jest-dom。
+【測試】編寫前端單元/元件測試：
+為一個簡單的元件（如 Header.tsx）編寫一個快照測試 (snapshot test)，確保其穩定性。
+為 ClassroomList.tsx 編寫一個元件測試，模擬傳入 props，並驗證元件是否能正確渲染出教室列表。
+第四步：整合 PostgreSQL 資料庫
+需整合至資料庫的資料：
+Classroom 資料表
+Reservation 資料表
+User 資料表
+執行項目：
+引入 Prisma ORM：安裝並初始化 Prisma，設定連接 PostgreSQL。
+定義資料模型：在 schema.prisma 中定義 Classroom, Reservation, User 模型，並包含關聯。
+資料庫遷移與填充：執行 prisma migrate dev 並建立 seed 腳本填充初始教室資料。
+重構 API：修改後端路由，改用 Prisma Client 操作資料庫。
+【測試】更新整合測試：修改第二步中編寫的 API 整合測試。設定一個獨立的測試資料庫，讓測試在執行前清空資料庫、填充必要的測試資料，並驗證 API 是否能正確地與資料庫互動。
+第五步：將應用程式 Docker 化
+建立 Dockerfile：分別為 backend 和 frontend (使用 Nginx) 編寫 Dockerfile。
+建立 docker-compose.yml：定義 backend、frontend 和 db 三個服務，並設定好網路與環境變數。
+【測試】在 Docker 中執行測試：修改 docker-compose.yml，新增一個指令或一個獨立的服務，讓我們可以執行後端的整合測試，以驗證容器化環境的正確性 (例如 docker-compose run backend npm test)。
+第六步：使用者驗證系統 (JWT, Email/密碼 & Google OAuth)
+後端實作：
+安裝套件：bcryptjs, jsonwebtoken, passport, passport-google-oauth20。
+實作 Email/密碼驗證：建立 register 和 login 路由。
+實作 Google OAuth 驗證：建立 /auth/google 和 /auth/google/callback 路由。
+建立 JWT 保護 middleware。
+前端實作：建立登入/註冊頁面，並整合狀態管理。
+【測試】編寫驗證功能的整合測試：為所有新的 auth 路由編寫測試。
+測試使用者註冊成功與失敗（例如 email 重複）的情境。
+測試使用者登入成功與失敗（密碼錯誤）的情境。
+測試受保護的路由在沒有提供 JWT 或提供無效 JWT 時，是否會回傳 401 未授權錯誤。
+第七步：基於角色的權限控制與管理員功能
+後端實作：在 User 模型增加 role 欄位，建立 isAdmin 權限 middleware，並建立受保護的教室管理 CRUD API。
+前端實作：建立路由保護的管理員後台頁面，並實作教室管理 UI。
+【測試】編寫權限控制的整合測試：
+測試一般 USER 角色的使用者，在嘗試存取管理員 API 時，是否會收到 403 禁止存取錯誤。
+測試 ADMIN 角色的使用者，是否能成功存取並操作教室管理的 CRUD API。
+第八步：端對端 (E2E) 測試
+引入 E2E 測試框架：在 frontend 專案中，安裝並設定 Cypress 或 Playwright。
+編寫關鍵使用者流程測試腳本：
+流程一：使用者預約 - 測試一個普通使用者從登入、選擇教室、跨週選擇多個時段、填寫預約表單到成功送出的完整流程。
+流程二：管理員管理教室 - 測試管理員登入、進入後台、成功新增一間教室、編輯該教室資訊，最後再刪除該教室的完整流程。
+整合至開發流程：說明如何在本地端針對 docker-compose 啟動的完整應用程式，執行 E2E 測試。
