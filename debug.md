@@ -26,22 +26,22 @@
 4.  **分析**：`ts-jest` 雖然啟動了，但它可能預設遵循了 `tsconfig.json` 中的 `"module": "ESNext"` 設定。Jest 在 Node.js 環境中執行，需要 `CommonJS` 模組。
 5.  **修正 `jest.config.js`**：強制 `ts-jest` 在測試時將 TypeScript 轉譯為 `CommonJS`。
     `javascript
-    /** @type {import('ts-jest').JestConfigWithTsJest} */
-    module.exports = {
-      preset: 'ts-jest',
-      testEnvironment: 'node',
-      transform: { // <-- 新增 transform
-        '^.+\\.tsx?$': [
-          'ts-jest',
-          {
-            tsconfig: {
-              module: 'commonjs', // <-- 強制使用 commonjs
-            },
-          },
-        ],
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  transform: { // <-- 新增 transform
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          module: 'commonjs', // <-- 強制使用 commonjs
+        },
       },
-    };
-    `
+    ],
+  },
+};
+`
     **結果：** `SyntaxError` 解決。
 
 ---
@@ -68,7 +68,7 @@
     - **結果**：`npm run build` **通過**。
 
 2.  **修正 `jest.config.js`**：欺騙 Jest。告訴它當看到 `.js` 匯入時，實際上要去尋找 `.ts` 檔案。
-    ```javascript
+    ````javascript
     /\*_ @type {import('ts-jest').JestConfigWithTsJest} _/
     module.exports = {
     // ... (preset, testEnvironment, transform)
@@ -79,6 +79,7 @@
         };
         ```
     **結果：** `npm run build` 和 `npm test` 都能正確解析模組。
+    ````
 
 ---
 
@@ -100,9 +101,9 @@
     ```
 2.  安裝 `jsonwebtoken` 及其型別：
     `bash
-    npm install jsonwebtoken
-    npm install --save-dev @types/jsonwebtoken
-    `
+npm install jsonwebtoken
+npm install --save-dev @types/jsonwebtoken
+`
     **結果：** 依賴問題解決。
 
 ---
