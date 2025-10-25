@@ -1,27 +1,22 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  // 1. 使用 ts-jest 的 *預設* preset，而不是 ESM preset
   preset: "ts-jest",
-
   testEnvironment: "node",
-
-  // 2. 配置 ts-jest 的轉換器
+  setupFiles: ["./jest.setup.js"],
+  // 1. 這是為了解決 'import' 語法 (SyntaxError)
   transform: {
-    "^.+\\.ts$": [
+    "^.+\\.tsx?$": [
       "ts-jest",
       {
-        // 3. (關鍵) 覆寫 tsconfig.json 的設定，
-        //    強制 ts-jest 為測試編譯出 CommonJS 模組
         tsconfig: {
           module: "commonjs",
-          esModuleInterop: true, // 允許 'import request from "supertest"' 這種 CJS 導入
         },
       },
     ],
   },
 
-  // 4. (仍然需要) 處理我們在程式碼中寫的 '.js' 擴充檔名
-  //    這會將 'import { app } from ./app.js' 映射到 './app'
+  // 2. 這是為了解決 "Cannot find module './app.js'"
+  //    (告訴 Jest 如何處理 .js 副檔名)
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
