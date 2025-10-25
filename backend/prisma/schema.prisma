@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------
+//          資料模型
+// ------------------------------------
+
+// 使用者模型 (第六步會用到)
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String?
+  // 關聯：一個使用者可以有多筆預約
+  reservations Reservation[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 教室模型
+model Classroom {
+  id       String @id @default(cuid()) // 使用 cuid() 作為預設 ID
+  name     String @unique
+  capacity Int
+  color    String
+  // 關聯：一間教室可以有多筆預約
+  reservations Reservation[]
+}
+
+// 預約模型
+model Reservation {
+  id        String @id @default(cuid())
+  purpose   String
+  
+  // 將 'date' 從 String 改為 DateTime，並標記為 @db.Date
+  date      DateTime @db.Date 
+  timeSlot  String
+  userName  String // 暫時保留，第六步整合 User 後移除
+
+  // 關聯：一筆預約屬於一間教室
+  classroom   Classroom @relation(fields: [classroomId], references: [id])
+  classroomId String
+
+  // 關聯：一筆預約屬於一個使用者
+  // (注意) 由於我們還沒有 User 登入，我們先讓 userId 可以為空 (nullable)
+  user     User?   @relation(fields: [userId], references: [id])
+  userId   String? // 加上 ? 標記為可選
+
+  createdAt DateTime @default(now())
+}

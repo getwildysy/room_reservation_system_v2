@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -12,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^6.18.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
   },
@@ -21,10 +23,13 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
     "@types/supertest": "^6.0.3",
+    "dotenv-cli": "^10.0.0",
     "jest": "^30.2.0",
+    "prisma": "^6.18.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }

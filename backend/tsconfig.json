@@ -42,5 +42,10 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src/**/*"] // 只編譯 src 目錄下的檔案
+  "include": ["src/**/*"], // 只編譯 src 目錄下的檔案
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.test.ts" // <-- 新增這一行
+  ]
 }

@@ -1,0 +1,60 @@
+# version: "3.8"
+
+services:
+  # 1. (新) 資料庫服務
+  db:
+    image: postgres:15-alpine # 使用官方的 Postgres 映像檔
+    container_name: classroom_db
+    restart: always
+    environment:
+      # 設定 Postgres 的超級使用者密碼和預設資料庫
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+      POSTGRES_DB: classroom_dev
+    ports:
+      # 將主機的 5432 port 映射到容器的 5432 port
+      # 如果你本地 5432 已被佔用，可以改成 "5433:5432"
+      - "5432:5432"
+    volumes:
+      # (可選) 將資料庫資料儲存在主機上，這樣容器重啟後資料不會消失
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. 後端服務
+  backend:
+    build:
+      context: ./backend
+      target: final
+    ports:
+      - "3001:3001"
+    environment:
+      # (重要) 讓後端連線到 Docker 內的 'db' 服務
+      DATABASE_URL: "postgresql://admin:admin_password@db:5432/classroom_dev?schema=public"
+      NODE_ENV: production
+    # (重要) 確保後端在資料庫啟動 *之後* 才啟動
+    depends_on:
+      - db
+
+  # 3. 前端服務
+  frontend:
+    build: ./frontend
+    ports:
+      # (注意) 這裡是你之前設定的 port，例如 "3000:80" 或 "3002:80"
+      - "3000:80"
+    depends_on:
+      - backend
+
+  # 4. 測試服務
+  backend-test:
+    build:
+      context: ./backend
+      target: builder
+    environment:
+      # (重要) 測試也需要連線資料庫
+      DATABASE_URL: "postgresql://admin:admin_password@db:5432/classroom_dev?schema=public"
+    command: npm test
+    depends_on:
+      - db
+
+# (新) 定義 Docker volume
+volumes:
+  postgres_data:

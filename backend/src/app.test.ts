@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "./app"; // 匯入我們的主應用程式實例
+import { app } from "./app.js"; // 匯入我們的主應用程式實例
 
 describe("GET /api", () => {
   it("應該回傳 200 OK 並包含歡迎訊息", async () => {

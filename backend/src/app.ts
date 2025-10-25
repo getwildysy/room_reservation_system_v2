@@ -1,11 +1,9 @@
-import express, { Express, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
-import {
-  initialClassrooms,
-  initialReservations,
-  Classroom,
-  Reservation,
-} from "./data";
+import { prisma } from "./db.js"; // <-- (新) 導入 Prisma Client
+
+// --- 型別 (Types) 導入 ---
+import type { Express, Request, Response } from "express";
 
 export const app: Express = express();
 
@@ -13,28 +11,38 @@ export const app: Express = express();
 app.use(cors());
 app.use(express.json());
 
-// --- 模擬資料庫 ---
-// 我們使用 'let' 並複製陣列，這樣才能在 POST 請求中修改它
-let classroomsDB: Classroom[] = [...initialClassrooms];
-let reservationsDB: Reservation[] = [...initialReservations];
+// // --- 模擬資料庫 ---
+// // 我們使用 'let' 並複製陣列，這樣才能在 POST 請求中修改它
+// let classroomsDB: Classroom[] = [...initialClassrooms];
+// let reservationsDB: Reservation[] = [...initialReservations];
 
 // 測試路由
 app.get("/api", (req: Request, res: Response) => {
   res.status(200).json({ message: "歡迎來到專科教室借用系統 API" });
 });
 
-// 1. GET /api/classrooms - 獲取所有教室
-app.get("/api/classrooms", (req: Request, res: Response) => {
-  res.status(200).json(classroomsDB);
+// 1. GET /api/classrooms - (重構)
+app.get("/api/classrooms", async (req: Request, res: Response) => {
+  try {
+    const classrooms = await prisma.classroom.findMany();
+    res.status(200).json(classrooms);
+  } catch (error) {
+    res.status(500).json({ message: "獲取教室資料失敗" });
+  }
 });
 
-// 2. GET /api/reservations - 獲取所有預約
-app.get("/api/reservations", (req: Request, res: Response) => {
-  res.status(200).json(reservationsDB);
+// 2. GET /api/reservations - (重構)
+app.get("/api/reservations", async (req: Request, res: Response) => {
+  try {
+    const reservations = await prisma.reservation.findMany();
+    res.status(200).json(reservations);
+  } catch (error) {
+    res.status(500).json({ message: "獲取預約資料失敗" });
+  }
 });
 
-// 3. POST /api/reservations - 建立新預約
-app.post("/api/reservations", (req: Request, res: Response) => {
+// 3. POST /api/reservations - (重構)
+app.post("/api/reservations", async (req: Request, res: Response) => {
   const { classroomId, userName, purpose, date, timeSlot } = req.body;
 
   // 基本驗證
@@ -42,16 +50,20 @@ app.post("/api/reservations", (req: Request, res: Response) => {
     return res.status(400).json({ message: "缺少必要的欄位" });
   }
 
-  const newReservation: Reservation = {
-    id: `r${Date.now()}`, // 簡單生成一個唯一的 ID
-    classroomId,
-    userName,
-    purpose,
-    date,
-    timeSlot,
-  };
-
-  reservationsDB.push(newReservation);
-
-  res.status(201).json(newReservation); // 201 Created
+  try {
+    const newReservation = await prisma.reservation.create({
+      data: {
+        classroomId: classroomId,
+        userName: userName, // 第六步會用 userId 取代
+        purpose: purpose,
+        date: new Date(date), // (重要) 將 ISO 字串轉換為 Date 物件
+        timeSlot: timeSlot,
+        // userId: null (目前先不填)
+      },
+    });
+    res.status(201).json(newReservation); // 201 Created
+  } catch (error) {
+    console.error(error); // 在後端日誌中印出詳細錯誤
+    res.status(500).json({ message: "建立預約失敗" });
+  }
 });
