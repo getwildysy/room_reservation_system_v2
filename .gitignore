@@ -2,6 +2,7 @@
 /backend/node_modules
 /backend/dist
 //
+//
 # Frontend dependencies (already covered by frontend/.gitignore, but good practice)
 /frontend/node_modules
 /frontend/dist
