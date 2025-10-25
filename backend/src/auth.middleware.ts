@@ -1,5 +1,9 @@
 import type { Request, Response, NextFunction } from "express"; // <-- 加入 type
 import jwt from "jsonwebtoken";
+<<<<<<< HEAD
+=======
+import { Request, Response, NextFunction } from "express";
+>>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
 import { prisma } from "./db.js";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;

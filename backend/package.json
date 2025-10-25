@@ -19,8 +19,12 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "passport": "^0.7.0",
+<<<<<<< HEAD
     "passport-google-oauth20": "^2.0.0",
     "prisma": "^6.18.0"
+=======
+    "passport-google-oauth20": "^2.0.0"
+>>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

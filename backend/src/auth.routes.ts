@@ -2,7 +2,11 @@ import { Router } from "express";
 import { prisma } from "./db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+<<<<<<< HEAD
 import { authenticateToken, type AuthRequest } from "./auth.middleware.js"; // 導入我們上一步建立的中介軟體
+=======
+import { authenticateToken, AuthRequest } from "./auth.middleware.js"; // 導入我們上一步建立的中介軟體
+>>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
 import passport from "./passport.setup.js";
 import type { Request, Response } from "express";
 
@@ -174,7 +178,11 @@ router.get(
     failureRedirect: "http://localhost:3000/login?error=google_failed", // (重要) 驗證失敗時，重導回前端登入頁並帶上錯誤訊息
     session: false, // 同上，不使用 session
   }),
+<<<<<<< HEAD
   (req: AuthRequest, res: Response) => {
+=======
+  (req: Request, res: Response) => {
+>>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
     // 驗證成功！
     // Passport 會將 Google 策略 done() 回呼中傳遞的 { user, token } 附加到 req.user
     const authInfo = req.user as { user: any; token: string };

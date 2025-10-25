@@ -1,9 +1,13 @@
 import passport from "passport";
+<<<<<<< HEAD
 import {
   Strategy as GoogleStrategy,
   Profile,
   VerifyCallback,
 } from "passport-google-oauth20";
+=======
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+>>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
 import { prisma } from "./db.js"; // 匯入 Prisma Client
 import jwt from "jsonwebtoken";
 
@@ -25,12 +29,16 @@ passport.use(
       callbackURL: "/api/auth/google/callback", // 根據我們的路由規劃
       scope: ["profile", "email"], // 要求獲取使用者的基本資料和 email
     },
+<<<<<<< HEAD
     async (
       accessToken: string,
       refreshToken: string | undefined, // refreshToken 可能不存在
       profile: Profile, // 使用導入的 Profile 型別
       done: VerifyCallback, // 使用導入的 VerifyCallback 型別
     ) => {
+=======
+    async (accessToken, refreshToken, profile, done) => {
+>>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
       // 這個函式會在 Google 成功驗證使用者後被呼叫
       // profile 物件包含了從 Google 獲取的用戶資訊
       try {
