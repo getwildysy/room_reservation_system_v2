@@ -90,13 +90,11 @@ describe("Auth API 整合測試 (/api/auth)", () => {
     it("帶有有效 Token 存取應成功 (回傳 200)", async () => {
       // --- 前置作業 (Setup) ---
       // 1. 註冊一個專門給此測試用的新使用者
-      await request(app)
-        .post("/api/auth/register")
-        .send({
-          email: "me-test@example.com",
-          password: "password123",
-          name: "Me User",
-        });
+      await request(app).post("/api/auth/register").send({
+        email: "me-test@example.com",
+        password: "password123",
+        name: "Me User",
+      });
 
       // 2. 登入該使用者以取得 token
       const loginRes = await request(app)
@@ -114,7 +112,13 @@ describe("Auth API 整合測試 (/api/auth)", () => {
 
       // --- 驗證結果 (Assert) ---
       expect(res.statusCode).toBe(200);
-      expect(res.body.message).toBe("你已成功存取受保護的路由");
+      // vvv Replace this line vvv
+      // expect(res.body.message).toBe("你已成功存取受保護的路由");
+      // vvv With these lines vvv
+      expect(res.body.email).toBe("me-test@example.com"); // Check for email
+      expect(res.body.name).toBe("Me User"); // Check for name
+      expect(res.body).toHaveProperty("id"); // Check if ID exists
+      expect(res.body).not.toHaveProperty("passwordHash"); // Ensure password is NOT returned
     });
   });
 });
