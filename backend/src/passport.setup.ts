@@ -1,13 +1,9 @@
 import passport from "passport";
-<<<<<<< HEAD
 import {
   Strategy as GoogleStrategy,
   Profile,
   VerifyCallback,
 } from "passport-google-oauth20";
-=======
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
->>>>>>> c1b758bb30ba4fb84218baaa6ea83931e4975c9d
 import { prisma } from "./db.js"; // 匯入 Prisma Client
 import jwt from "jsonwebtoken";
 
