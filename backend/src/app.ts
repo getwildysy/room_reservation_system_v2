@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "./db.js"; // <-- (新) 導入 Prisma Client
+import authRouter from "./auth.routes.js"; // <-- (重要) 必須導入 authRouter
 
 // --- 型別 (Types) 導入 ---
 import type { Express, Request, Response } from "express";
@@ -10,6 +11,7 @@ export const app: Express = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRouter); // <-- (重要) 必須掛載 authRouter
 
 // // --- 模擬資料庫 ---
 // // 我們使用 'let' 並複製陣列，這樣才能在 POST 請求中修改它
